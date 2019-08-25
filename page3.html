@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html  >
+<link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.7.0/css/all.css' integrity='sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ' crossorigin='anonymous'>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script type = "text/javascript" src = "http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script> 
+<script type = "text/javascript" >
+	$(document).ready(function(){
+		var id=localStorage.getItem("id");
+		if (id==null){
+			alert("pls login");
+			window.location.href = "/index";
+			return;
+		}else{
+			$.ajax({
+				type: 'POST',
+				url: 'http://127.0.0.1:9999/checkname',
+				dataType:"text",
+				data:id,
+				success: function(data) {
+					document.getElementById('welcome_message').style.display='block';
+					document.getElementById('logout').style.display='block';
+					var user=data;
+					document.getElementById('welcome_message').innerHTML="Welcome,"+data;
+				},
+				error: function(xhr, status, error) {
+					console.log('Error: ' + error.message);
+					window.location.href="/index" ;
+				}
+			});
+		}
+
+		$("#fav_list").click(function(){
+			$.ajax({
+				type: 'POST',
+				url: 'http://127.0.0.1:9999/favweb',
+				dataType:"text",
+				success: function(data) {
+					if (data == "Error") {
+		        	alert('data error');
+    				} else {
+        			window.location.href = "/favweb";
+    				}           
+				},
+				error: function(xhr, status, error) {
+					console.log('Error: ' + error.message);
+				}
+			});
+		});
+		
+		$("#modify").click(function(){
+			$.ajax({
+				type: 'POST',
+				url: 'http://127.0.0.1:9999/mod',
+				dataType:"text",
+				success: function(data) {
+					if (data == "Error") {
+		        	alert('data error');
+    				} else {
+        			window.location.href = "/mod";
+    				}           
+				},
+				error: function(xhr, status, error) {
+					console.log('Error: ' + error.message);
+				}
+
+			});
+		});		
+		
+		
+		$("#resetBtn").click(function(){
+			var old_pass=$("#old_password").val();
+			var new_pass=$("#new_password").val();
+			
+			if(old_pass==new_pass){
+				alert("can't be same password")
+				window.location.href = "http://127.0.0.1:9999/mod";
+				return;
+			}
+			else if( old_pass==null|| new_pass==null){
+				alert("plz check input data")
+				window.location.href = "http://127.0.0.1:9999/mod";
+				return;
+			}else{
+				var change_data="id="+id+"&old_pass="+old_pass+"&new_pass="+new_pass;
+			
+				$.ajax({
+					type: 'PUT',
+					url: 'http://127.0.0.1:9999/update2',
+					dataType:"text",
+					data:change_data,
+					success: function(data) {
+					if(data=="password error"){
+					alert("Current-Password fault");
+					}else{
+					alert("password updated");
+					window.location.href = "http://127.0.0.1:9999/mod";             
+					}
+					},
+
+					
+					error: function(xhr, status, error) {
+						console.log('Error: ' + error.message);
+					}
+				});
+			}
+		});
+		
+		$("#index").click(function(){
+			$.ajax({
+				type: 'POST',
+				url: 'http://127.0.0.1:9999/index',
+				dataType:"text",
+				success: function(data) {
+				window.location.href = "/index";
+					if (data == "Error") {
+		        	alert('data error');
+    				} else {
+        			window.location.href = "/index";
+    				}           
+				},
+				error: function(xhr, status, error) {
+					console.log('Error: ' + error.message);
+				}
+
+			});
+		});		
+
+		$("#API_show").click(function(){
+			$.ajax({
+				type: 'POST',
+				url: 'http://127.0.0.1:9999/api/v1.0/favData',
+				dataType:"text",
+				success: function(data) {      
+					if (data == "Error") {
+		        	alert('data error');
+    				} else {
+        			window.location.href = "/api/v1.0/favData";
+    				} 
+				},
+				error: function(xhr, status, error) {
+					console.log('Error: ' + error.message);
+				}
+			});
+		});	
+		
+		$("#fav_show").click(function(){
+			$.ajax({
+				type: 'POST',
+				url: 'http://127.0.0.1:9999/table',
+				dataType:"text",
+				success: function(data) { 
+					if (data == "Error") {
+		        	alert('data error');
+    				} else {
+        			window.location.href = "/table";
+    				} 
+				},
+				error: function(xhr, status, error) {
+					console.log('Error: ' + error.message);
+				}
+			});
+		});	
+  		
+	});		
+	function logout(){
+		window.localStorage.removeItem('id');
+	window.location.href="/index" ;
+	}	
+	
+</script>
+
+<head>
+  <!-- Site made with Mobirise Website Builder v4.10.0, https://mobirise.com -->
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Mobirise v4.10.0, mobirise.com">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+  <link rel="shortcut icon" href="assets/images/logo2.png" type="image/x-icon">
+  <meta name="description" content="Website Maker Description">
+  
+  <title>Modify Password</title>
+  <link rel="stylesheet" href="assets/tether/tether.min.css">
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap-grid.min.css">
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap-reboot.min.css">
+  <link rel="stylesheet" href="assets/dropdown/css/style.css">
+  <link rel="stylesheet" href="assets/theme/css/style.css">
+  <link rel="stylesheet" href="assets/mobirise/css/mbr-additional.css" type="text/css">
+  
+  
+  
+</head>
+<body>
+<section class="menu cid-qTkzRZLJNu" once="menu" id="menu1-3">
+    <nav class="navbar navbar-expand beta-menu navbar-dropdown align-items-center navbar-fixed-top navbar-toggleable-sm">
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </button>
+        <div class="menu-logo">
+            <div class="navbar-brand">
+                <span class="navbar-logo">
+                    <img id="index" src="assets/images/logo2.png" alt="Mobirise" style="height: 3.8rem;">    
+                </span>
+                <span class="navbar-caption-wrap">
+                    <a class="navbar-caption text-white display-4">
+                        Board game
+                    </a>
+                </span>
+				
+				<div id="welcome_message" class="welcome" style="display:none"></div>&nbsp;<div id="logout" style="display:none"><a onClick="logout();"><font color="#33FFFF"><u>LogOut</u></font></a></div>
+			
+			</div>
+		</div>
+        
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav nav-dropdown nav-right" data-app-modern-menu="true">
+			<li class="nav-item">
+				<a class="nav-link link text-white display-4" id="fav_list"><span class="fa fa-heart-o" style="font-size:36px;"></span>
+					Boardgame
+					</a>
+			</li>
+			<li class="nav-item dropdown open">
+				<a class="nav-link link text-white dropdown-toggle display-4" data-toggle="dropdown-submenu">
+				<i class="fa fa-heart" style="font-size:36px"></i>&nbsp;
+				My Fav</a>
+					<div class="dropdown-menu"><a class="text-white dropdown-item display-4" id="API_show"><i class="fa fa-wrench" style="font-size:36px"></i>&nbsp;My Fav API</a><a class="text-white dropdown-item display-4" id="fav_show"><i class="fa fa-file-text-o" style="font-size:36px"></i>&nbsp;My Fav Table</a></div></li>
+			<li class="nav-item">
+				<a class="nav-link link text-white display-4" id="modify">
+				<i class="fa fa-gear" style="font-size:36px;"></i>&nbsp; 
+					Modify Password
+                    </a>
+			</li>
+			</ul>
+        </div>
+    </nav>
+</section>
+
+
+
+<section class="engine"><a href="https://mobirise.info/q">responsive site templates</a></section><script src="assets/web/assets/jquery/jquery.min.js"></script>
+<section class="cid-qTkA127IK8 mbr-fullscreen mbr-parallax-background" id="header2-1">
+	<div class="container align-center">
+        <div class="row justify-content-md-center">
+            <div class="mbr-black col-md-6">
+                <h1 class="mbr-section-title mbr-bold pb-3 mbr-fonts-style">
+                    UPDATE Password
+                </h1>
+				<h4>Current-Password :</h4>
+				<input class="inputstyle2"  type="password" id="old_password" placeholder="*********">
+				<br>
+				<h4>New-Password :</h4>
+				<input class="inputstyle2"  type="password" id="new_password" placeholder="*********"><span id='message'></span><br>
+				<div align="center"><input class="register-form-btn" type="submit" value="Submit" id="resetBtn" ></input></div>
+			</div>
+		</div>
+	</div>
+</section>
+  <script src="assets/popper/popper.min.js"></script>
+  <script src="assets/tether/tether.min.js"></script>
+  <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+  <script src="assets/smoothscroll/smooth-scroll.js"></script>
+  <script src="assets/dropdown/js/script.min.js"></script>
+  <script src="assets/touchswipe/jquery.touch-swipe.min.js"></script>
+  <script src="assets/theme/js/script.js"></script>
+  
+  
+</body>
+</html>

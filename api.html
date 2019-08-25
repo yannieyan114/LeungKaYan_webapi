@@ -1,0 +1,66 @@
+<html>
+<head><title>api</title>
+<script type = "text/javascript" src = "http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script> 
+    <pre></pre>
+	<script type = "text/javascript" >
+	$(document).ready(function(){
+		var id=localStorage.getItem("id");
+		if (id==null){
+			alert("pls login");
+			window.location.href = "/index";
+			return;
+		}else{
+			var id=localStorage.getItem("id");
+			
+			$.ajax({
+				type: 'post',
+				url: 'http://127.0.0.1:9999/api',
+				dataType:"json",
+				data:id,
+				success: function(data) {
+				console.log(typeof(data)); 
+				$('pre').html(JSON.stringify(data, undefined, 2));
+				 /*var html_to_append = '';
+				$.each(data, function(i, item) {
+					html_to_append +=
+					'<div class="col-3 mb-3"><div class="text-uppercase"><p>' +
+					item._id + 
+					'<div class="col-3 mb-3"><div class="ext-uppercase"><p>' +
+					item.id +
+					'</p></div><img  class="image img-fluid" src="' +
+					item.favData +
+					'" /><p class="company"></p></div>';
+				});
+				$("#api1").html(html_to_append);*/
+				//window.location.href = "/api";
+					//data= JSON.stringify(data);
+					//data=JSON.parse(data);
+					//console.log('parse'+data1)
+					
+					//console.log('string'+data1);   
+								//console.log(data.length);
+								//var output='';
+								//for(var i=0;i<data.length;i++){
+					
+					//console.log(data1);
+								//output+='<p>'+JSON.stringify(data[i])+',</p>';
+								//console.log(output);
+								//}
+					//document.getElementById('api1').style.display='block';
+								//document.getElementById('api1').innerHTML=output;
+					//document.getElementById('api1').innerHTML=='<p>'+data1+'</p>';
+								//console.log(document.getElementById('api1').innerHTML);  
+					},
+				error: function(xhr, status, error) {
+					console.log('Error: ' + error.message);
+				}
+
+			});
+		}
+	});
+</script>
+</head>
+<body>
+<div id="api1"></div>
+</body>
+</html>

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html  >
+<link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.7.0/css/all.css' integrity='sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ' crossorigin='anonymous'>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script type = "text/javascript" src = "http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script> 
+<script type = "text/javascript" >
+	$(document).ready(function(){
+		var id=localStorage.getItem("id");
+		if (id==null){
+			alert("pls login");
+			window.location.href = "/index";
+			return;
+		}else{
+			$.ajax({
+				type: 'POST',
+				url: 'http://127.0.0.1:9999/checkname',
+				dataType:"text",
+				data:id,
+				success: function(data) {
+					document.getElementById('welcome_message').style.display='block';
+					document.getElementById('logout').style.display='block';
+					var user=data;
+						document.getElementById('welcome_message').innerHTML="Welcome,"+data;
+					},
+					error: function(xhr, status, error) {
+						console.log('Error: ' + error.message);
+						window.location.href="/index" ;
+					}
+			});
+		}
+		
+		$.ajax({
+			type: 'get',
+			url: 'https://www.boardgameatlas.com/api/search?name=Catan&client_id=SB1VGnDv7M',
+			dataType:"text",
+			data:"",
+			success: function(data) {
+				data1=JSON.parse(data);
+				console.log(data1.games[0].name);
+				console.log(data1.games.length);
+				var output='';
+				for(var i=0;i<data1.games.length;i++){
+					var gameId=data1.games[i].id;
+					output+='<tr><td><img src="'+data1.games[i].images.small+'"></img></td><td>'+data1.games[i].name+'</td><td>'+data1.games[i].min_players+'</td><td>'+data1.games[i].max_players+'</td><td>'+data1.games[i].min_playtime+'</td><td>'+data1.games[i].max_playtime+'</td><td><a target="_blank" href="'+data1.games[i].url+' ">Official Website</a></td><td>'+data1.games[i].year_published+'</td><td><i id="'+gameId+'" class="fa fa-heart-o" style="font-size:36px;color:grey" onclick="addFav('+"'"+gameId+"'"+",'"+data1.games[i].name+"'"+",'"+data1.games[i].year_published+"'"+",'"+data1.games[i].images.small+"'"+",'"+data1.games[i].url+"'"+')"></td></tr>';
+				}
+				
+					$.ajax({
+						type: 'POST',
+						url: 'http://127.0.0.1:9999/checkfav',
+						dataType:"text",
+						data:id,
+						success: function(data) {
+							data=JSON.parse(data);
+							var data1=[];
+							for(j=0;j<data.length;j++){
+								console.log(data[j].gameYear);
+								//alert("for data"+data[j].gameYear)
+								document.getElementById(data[j].gameId).className = "fa fa-heart";
+								document.getElementById(data[j].gameId).style.color = "red";
+							}
+						}
+					});	
+					document.getElementById('APItable').innerHTML='<table border="1" width="100%"><tr><td><b>Board game image</b></td><td><b>Board game name</b></td><td><b>Minimun player</b></td><td><b>Maximun player</b></td><td><b>Minimun playtime</b></td><td><b>Maximun playtime</b></td><td><b>Website</b></td><td><b>Year publish</b></td><td><b>add favourite</b></td></tr>'+output+'</table>';         
+			}
+		});
+		
+		$(".select_filter").click(function(){
+		var fired_button = $(this).val(); 
+		//alert(fired_button);
+			$.ajax({
+				type: 'get',
+				url: 'https://www.boardgameatlas.com/api/search?name=Catan&client_id=SB1VGnDv7M&year_published='+fired_button,
+				dataType:"text",
+				data:"",
+				success: function(data) {
+					data1=JSON.parse(data);
+					console.log(data1.games[0].name);
+					console.log(data1.games.length);
+					var output='';
+						for(var i=0;i<data1.games.length;i++){
+							var gameId=data1.games[i].id;
+							var gameId2=[];
+							gameId2[i]=data1.games[i].id;
+							
+							output+='<tr><td><img src="'+data1.games[i].images.small+'"></img></td><td>'+data1.games[i].name+'</td><td>'+data1.games[i].min_players+'</td><td>'+data1.games[i].max_players+'</td><td>'+data1.games[i].min_playtime+'</td><td>'+data1.games[i].max_playtime+'</td><td><a target="_blank" href="'+data1.games[i].url+' ">Official Website</a></td><td>'+data1.games[i].year_published+'</td><td><i id="'+gameId+'" class="fa fa-heart-o" style="font-size:36px;color:grey" onclick="addFav('+"'"+gameId+"'"+",'"+data1.games[i].name+"'"+",'"+data1.games[i].year_published+"'"+",'"+data1.games[i].images.small+"'"+",'"+data1.games[i].url+"'"+')"></td></tr>';
+						}
+						
+						$.ajax({
+							type: 'POST',
+							url: 'http://127.0.0.1:9999/checkfav',
+							dataType:"text",
+							data:id,
+							success: function(data) {
+								data=JSON.parse(data);
+								var data1=[];
+									for(j=0;j<data.length;j++){
+										console.log(data[j].gameYear);
+										//alert("for data"+data[j].gameYear)
+										if(data[j].gameYear!=fired_button){
+											continue;
+										}else{
+											document.getElementById(data[j].gameId).className = "fa fa-heart";
+											document.getElementById(data[j].gameId).style.color = "red";
+										}
+									}
+							}
+						});	
+						
+						document.getElementById('APItable').innerHTML='<table border="1" width="100%"><tr><td><b>Board game image</b></td><td><b>Board game name</b></td><td><b>Minimun player</b></td><td><b>Maximun player</b></td><td><b>Minimun playtime</b></td><td><b>Maximun playtime</b></td><td><b>Website</b></td><td><b>Year publish</b></td><td><b>add favourite</b></td></tr>'+output+'</table>';
+				}
+			});
+		});
+		
+		$("#index").click(function(){
+			$.ajax({
+				type: 'POST',
+				url: 'http://127.0.0.1:9999/index',
+				dataType:"text",
+				success: function(data) {
+					if (data == "Error") {
+		        	alert('Data error');
+    				} else {
+        			window.location.href = "/index";
+    				}           
+				},
+				error: function(xhr, status, error) {
+					console.log('Error: ' + error.message);
+				}
+			});
+		});	
+		
+		$("#fav_list").click(function(){
+			$.ajax({
+				type: 'POST',
+				url: 'http://127.0.0.1:9999/favweb',
+				dataType:"text",
+				success: function(data) { 
+					if (data == "Error") {
+		        	alert('Data error');
+    				} else {
+        			window.location.href = "/favweb";
+    				}           
+				},
+				error: function(xhr, status, error) {
+					console.log('Error: ' + error.message);
+				}
+			});
+		});
+		
+		$("#modify").click(function(){		
+			$.ajax({
+				type: 'POST',
+				url: 'http://127.0.0.1:9999/mod',
+				dataType:"text",
+				success: function(data) {
+					if (data == "Error") {
+		        	alert('Data error');
+    				} else {
+        			window.location.href = "/mod";
+    				}           
+				},
+				error: function(xhr, status, error) {
+					console.log('Error: ' + error.message);
+				}
+
+			});
+		});	
+		
+		$("#API_show").click(function(){
+			$.ajax({
+				type: 'POST',
+				url: 'http://127.0.0.1:9999/api/v1.0/favData',
+				dataType:"text",
+				success: function(data) {      
+					if (data == "Error") {
+		        	alert('Data error');
+    				} else {
+        			window.location.href = "/api/v1.0/favData";
+    				} 
+				},
+				error: function(xhr, status, error) {
+					console.log('Error: ' + error.message);
+				}
+			});
+		});	
+		
+		$("#fav_show").click(function(){
+			$.ajax({
+				type: 'POST',
+				url: 'http://127.0.0.1:9999/table',
+				dataType:"text",
+				success: function(data) { 
+					if (data == "Error") {
+		        	alert('Data error');
+    				} else {
+        			window.location.href = "/table";
+    				} 
+				},
+				error: function(xhr, status, error) {
+					console.log('Error: ' + error.message);
+				}
+			});
+		});	  		
+		
+	});
+	
+	function addFav(gameId,gameName,gameYear,gameImage,gameUrl){
+		var id=localStorage.getItem("id");
+		if(document.getElementById(gameId).style.color == "red"){
+			document.getElementById(gameId).className = "fa fa-heart-o";
+			document.getElementById(gameId).style.color = "grey";
+			
+			//AJAX request to remove fav gameid
+			var request = $.ajax({
+				url: "http://127.0.0.1:9999/del",
+				type: "DELETE",
+				data: {gameId: gameId, gameName:gameName, gameYear:gameYear, gameImage:gameImage, gameUrl:gameUrl, id:id},
+				dataType: "text/json"
+			});
+			
+			function deleted()
+			{request};
+			alert("Delete success");
+		}else{
+			document.getElementById(gameId).className = "fa fa-heart";
+			document.getElementById(gameId).style.color = "red";
+
+			//AJAX request to add a fav bookid
+			var request = $.ajax({
+				url: "http://127.0.0.1:9999/fav",
+				type: "POST",
+				data: {gameId: gameId, gameName:gameName, gameYear:gameYear, gameImage:gameImage, gameUrl:gameUrl, id:id},
+				dataType: "text/json"
+			});
+
+			function adding()
+				{request};
+			alert("Insert success");
+		}
+	}
+
+	function logout(){
+		window.localStorage.removeItem('id');
+		window.location.href="/index" ;
+	}
+	
+	function reload(){
+		window.location.href="/favweb" ;
+	}
+</script>
+
+<head>
+  <!-- Site made with Mobirise Website Builder v4.10.0, https://mobirise.com -->
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Mobirise v4.10.0, mobirise.com">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+  <link rel="shortcut icon" href="assets/images/logo2.png" type="image/x-icon">
+  <meta name="description" content="Website Maker Description">
+  
+  <title>Board Game List</title>
+  <link rel="stylesheet" href="assets/tether/tether.min.css">
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap-grid.min.css">
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap-reboot.min.css">
+  <link rel="stylesheet" href="assets/dropdown/css/style.css">
+  <link rel="stylesheet" href="assets/theme/css/style.css">
+  <link rel="stylesheet" href="assets/mobirise/css/mbr-additional.css" type="text/css">
+
+</head>
+
+<body>
+<section class="menu cid-qTkzRZLJNu" once="menu" id="menu1-3">
+    <nav class="navbar navbar-expand beta-menu navbar-dropdown align-items-center navbar-fixed-top navbar-toggleable-sm">
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </button>
+        <div class="menu-logo">
+            <div class="navbar-brand">
+                <span class="navbar-logo">
+					<img id="index" src="assets/images/logo2.png" alt="Mobirise" style="height: 3.8rem;">
+				</span>
+                <span class="navbar-caption-wrap">
+                    <a class="navbar-caption text-white display-4">
+                        Board game
+                    </a>
+                </span>
+				
+			<div id="welcome_message" class="welcome" style="display:none"></div>&nbsp;
+			<div id="logout" style="display:none"><a onClick="logout();"><font color="#33FFFF"><u>LogOut</u></font></a></div>
+			</div>
+        </div>
+		
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav nav-dropdown nav-right" data-app-modern-menu="true">
+			<li class="nav-item">
+				<a class="nav-link link text-white display-4" id="fav_list"><span class="fa fa-heart-o" style="font-size:36px;"></span>
+					Boardgame
+					</a>
+			</li>
+			<li class="nav-item dropdown open">
+				<a class="nav-link link text-white dropdown-toggle display-4" data-toggle="dropdown-submenu">
+				<i class="fa fa-heart" style="font-size:36px"></i>&nbsp;
+				My Fav</a>
+					<div class="dropdown-menu"><a class="text-white dropdown-item display-4" id="API_show"><i class="fa fa-wrench" style="font-size:36px"></i>&nbsp;My Fav API</a><a class="text-white dropdown-item display-4" id="fav_show"><i class="fa fa-file-text-o" style="font-size:36px"></i>&nbsp;My Fav Table</a></div></li>
+			<li class="nav-item">
+				<a class="nav-link link text-white display-4" id="modify">
+				<i class="fa fa-gear" style="font-size:36px;"></i>&nbsp; 
+					Modify Password
+                    </a>
+			</li>
+			</ul>
+        </div>
+    </nav>
+</section>
+
+
+<section class="engine"><a href="https://mobirise.info/q">responsive site templates</a></section><script src="assets/web/assets/jquery/jquery.min.js"></script>
+	<section class="cid-qTkA127IK8 mbr-fullscreen mbr-parallax-background" id="header2-1">
+	<div class="container align-center">
+        <div class="row justify-content-md-center">
+            <h1 class="mbr-section-title mbr-bold pb-3 mbr-fonts-style">
+                    Boardgame List
+            </h1>
+				
+			<table border="0" cellpadding="100" width="80%"><tr><td><div style="font-size:25px;">Publish Year</div></td><td><a id="fav_show"><input class="select-btn" type="submit" value="All" onClick="reload()"></input></a></td><td><a id="fav_list"><input class="select-btn select_filter" type="submit" value="null"></input></a></td><td><input class="select-btn select_filter" type="submit" value="2018" id="resetBtn" ></input></td><td><input class="select-btn select_filter" type="submit" value="2017" id="resetBtn" ></input></td><td><input class="select-btn select_filter" type="submit" value="2016" id="resetBtn" ></input></td><td><input class="select-btn select_filter" type="submit" value="2015" id="resetBtn" ></input></td><td><input class="select-btn select_filter" type="submit" value="2014" id="resetBtn" ></input></td></tr><tr><td colspan="7">&nbsp;</td></tr></table>
+				
+			<div class="mbr-black col-md-12">
+				<div id="APItable"></div>
+			</div>
+	</section>
+  <script src="assets/popper/popper.min.js"></script>
+  <script src="assets/tether/tether.min.js"></script>
+  <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+  <script src="assets/smoothscroll/smooth-scroll.js"></script>
+  <script src="assets/dropdown/js/script.min.js"></script>
+  <script src="assets/touchswipe/jquery.touch-swipe.min.js"></script>
+  <script src="assets/theme/js/script.js"></script>
+  
+  
+</body>
+</html>

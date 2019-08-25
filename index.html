@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html  >
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script type = "text/javascript" src = "http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script> 
+<script type = "text/javascript" >
+	$(document).ready(function(){
+
+		$('#reg_re_password').on('keyup', function () {
+			if ($('#reg_password').val() == $('#reg_re_password').val()) {
+				$('#message').html('Matching').css('color', 'green');
+			} else 
+				$('#message').html('Not Matching').css('color', 'red');
+		});
+		
+		$('#reg_email').on('keyup', function () {
+			var $email = this.value;
+			validateEmail($email);
+		
+		});
+		
+		function validateEmail(email) {
+			var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+			if (!emailReg.test(email)) {
+				$('#result').html('Not Valid').css('color', 'red');			
+			} else {
+				$('#result').html('Valid').css('color', 'green');
+		}
+}
+		var id=localStorage.getItem("id");
+		if (id==null){
+			document.getElementById('login_section').style.display='block';
+
+		}else{
+			
+			$.ajax({
+					type: 'POST',
+					url: 'http://127.0.0.1:9999/checkname',
+					dataType:"text",
+					data:id,
+					success: function(data) {  
+						document.getElementById('login_section').style.display='none';
+						document.getElementById('welcome_message').style.display='block';
+						document.getElementById('logout').style.display='block';
+						var user=data;
+						document.getElementById('welcome_message').innerHTML="Welcome,"+data;
+					},
+					error: function(xhr, status, error) {
+						console.log('Error: ' + error.message);
+						window.location.href="/index" ;
+					}
+			});
+		}
+		
+		$("#login_btn").click(function(){
+			var login=$("#login").val();
+			var pass=$("#password").val();
+			if (login==""||pass==""){
+			alert("Please enter the username or password!");
+			}else{
+			var mydata="login="+login+"&password="+pass;
+		
+			$.ajax({
+				type: 'POST',
+				url: 'http://127.0.0.1:9999/login',
+				dataType:"text",
+				data:mydata,
+				success: function(data) {
+				if(data=="Fail to login"){
+					alert("Fail to login");
+					return;
+				}else if(data!=""){
+				//can use cookies/storage
+				localStorage.setItem("id",data);
+				location.href="http://127.0.0.1:9999/favweb" ;
+				}else{
+					alert("XXX");
+				
+				
+				}
+					console.log('yay');
+					console.log(data);              
+				},
+				error: function(xhr, status, error) {
+					console.log('Error: ' + error.message);
+				}
+
+			});
+			}
+			
+			
+		});	
+		
+		$("#submitBtn").click(function(){
+		var reg_login=$("#reg_login").val();
+		var reg_pass=$("#reg_password").val();
+		var reg_re_pass=$("#reg_re_password").val();
+		var reg_email=$("#reg_email").val();
+		
+		if(reg_pass!=reg_re_pass){
+			alert("plz confirm password")
+			//window.location.href = "http://127.0.0.1:9999/index";
+			return;
+		}
+		else if( reg_login==""|| reg_pass==""|| reg_re_pass==""){
+			alert("plz check input data")
+			//window.location.href = "http://127.0.0.1:9999/index";
+			return;
+		}
+		else if( document.getElementById("result").innerHTML=="Not Vaild"){
+			alert("Email Not Valid")
+			//window.location.href = "http://127.0.0.1:9999/index";
+			return;
+		}
+		else{
+		
+			var reg_data="reglogin="+reg_login+"&regpassword="+reg_pass+"&regpassword2="+reg_re_pass+"&regemail="+reg_email;
+			//alert(reg_data);
+			
+			$.ajax({
+				type: 'POST',
+				url: 'http://127.0.0.1:9999/reg',
+				dataType:"text",
+				data:reg_data,
+				success: function(data) {
+					//alert("check_reg:"+data);
+					if(data=="success"){
+						alert("Register success."); 
+						window.location.href="/index";
+					}else if(data=="used"){
+						alert("Username has been used.Please Register again.");
+					}else{}
+				},
+				error: function(xhr, status, error) {
+					console.log('Error: ' + error.message);
+					//window.location.href="/index" ;
+				}
+			
+			});
+			
+			//window.location.href="/index" ;
+			}
+			
+		});
+		
+		$("#fav_list").click(function(){
+			$.ajax({
+				type: 'POST',
+				url: 'http://127.0.0.1:9999/favweb',
+				dataType:"text",
+				success: function(data) {
+					if (data == "Error") {
+		        	alert('data error');
+    				} else {
+        			window.location.href = "/favweb";
+    				}           
+				},
+				error: function(xhr, status, error) {
+					console.log('Error: ' + error.message);
+				}
+			});
+		});
+		
+		$("#modify").click(function(){
+			$.ajax({
+				type: 'POST',
+				url: 'http://127.0.0.1:9999/mod',
+				dataType:"text",
+				success: function(data) { 
+					if (data == "Error") {
+		        	alert('data error');
+    				} else {
+        			window.location.href = "/mod";
+    				}           
+				},
+				error: function(xhr, status, error) {
+					console.log('Error: ' + error.message);
+				}
+
+			});
+		});		
+		
+		$("#index").click(function(){	
+			$.ajax({
+				type: 'POST',
+				url: 'http://127.0.0.1:9999/index',
+				dataType:"text",
+				success: function(data) {
+					if (data == "Error") {
+		        	alert('data error');
+    				} else {
+        			window.location.href = "/index";
+    				}           
+				},
+				error: function(xhr, status, error) {
+					console.log('Error: ' + error.message);
+				}
+
+			});
+		});	
+		
+		$("#API_show").click(function(){
+			$.ajax({
+				type: 'POST',
+				url: 'http://127.0.0.1:9999/api/v1.0/favData',
+				dataType:"text",
+				success: function(data) {      
+					if (data == "Error") {
+		        	alert('data error');
+    				} else {
+        			window.location.href = "/api/v1.0/favData";
+    				} 
+				},
+				error: function(xhr, status, error) {
+					console.log('Error: ' + error.message);
+				}
+			});
+		});	
+		
+		$("#fav_show").click(function(){
+			$.ajax({
+				type: 'POST',
+				url: 'http://127.0.0.1:9999/table',
+				dataType:"text",
+				success: function(data) { 
+					if (data == "Error") {
+		        	alert('data error');
+    				} else {
+        			window.location.href = "/table";
+    				} 
+				},
+				error: function(xhr, status, error) {
+					console.log('Error: ' + error.message);
+				}
+			});
+		});	   
+	});
+	
+	function logout(){
+	window.localStorage.removeItem('id');
+	window.location.href="/index" ;	
+}
+</script> 
+<head>
+  <!-- Site made with Mobirise Website Builder v4.10.0, https://mobirise.com -->
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Mobirise v4.10.0, mobirise.com">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+  <link rel="shortcut icon" href="assets/images/logo2.png" type="image/x-icon">
+  <meta name="description" content="">
+  
+  <title>Home</title>
+  <link rel="stylesheet" href="assets/tether/tether.min.css">
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap-grid.min.css">
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap-reboot.min.css">
+  <link rel="stylesheet" href="assets/socicon/css/styles.css">
+  <link rel="stylesheet" href="assets/dropdown/css/style.css">
+  <link rel="stylesheet" href="assets/theme/css/style.css">
+  <link rel="stylesheet" href="assets/mobirise/css/mbr-additional.css" type="text/css">
+  
+  
+  
+</head>
+
+<body>
+  <section class="menu cid-qTkzRZLJNu" once="menu" id="menu1-0">
+
+    
+
+    <nav class="navbar navbar-expand beta-menu navbar-dropdown align-items-center navbar-fixed-top navbar-toggleable-sm">
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </button>
+        <div class="menu-logo">
+            <div class="navbar-brand">
+                <span class="navbar-logo">
+                    
+                         <img id="index" src="assets/images/logo2.png" alt="Mobirise" style="height: 3.8rem;">
+                    
+                </span>
+                <span class="navbar-caption-wrap">
+                    <a class="navbar-caption text-white display-4">
+                        Board game
+                    </a>
+                </span>
+				<div id="login_section" style="display:block">
+				<table><tr><td><input type="text" id="login" class="inputstyle" placeholder="Username"></input></td>
+				<td><input type="password" id="password" class="inputstyle" placeholder="Password"></input></td>
+				<td><button id="login_btn" class="login-btn">Login</button></td>
+				<td><button id="register_btn" class="register-btn" onclick="document.getElementById('modal-wrapper').style.display='block'">Register</button></td>
+				</tr></table>				
+				</div>
+				
+				<div id="welcome_message" class="welcome" style="display:none"></div>&nbsp;<div id="logout" style="display:none"><a onClick="logout();"><font color="#33FFFF"><u>LogOut</u></font></a></div>
+			</div>
+        </div>
+		
+        <div id="modal-wrapper" class="modal">
+			<div class="modal-content animate">
+				<div class="imgcontainer">
+					<span onclick="document.getElementById('modal-wrapper').style.display='none'" class="close" title="Close PopUp">&times;</span>
+					<h2 style="text-align:center">Register FORM</h2>
+				</div>
+				<div class="modalcontainer">
+					<h4>Username :</h4>
+					<input class="inputstyle2"  type="text" id="reg_login" placeholder="johndoe">
+					<br>
+					<h4>Password :</h4>
+					<input class="inputstyle2"  type="password" id="reg_password" placeholder="*********">
+					<br>
+					<h4>Re-Password :</h4>
+					<input class="inputstyle2"  type="password" id="reg_re_password" placeholder="*********"><span id='message'></span><br>
+					<h4>Email :</h4>
+					<input class="inputstyle2"  type="text" id="reg_email" placeholder="johndoe@example.com"><span id='result'></span><br><br>
+					<div align="center"><input class="register-form-btn" type="submit" value="Submit" id="submitBtn" ></input></div>      
+				</div>
+			</div>  
+		</div>
+                
+		<script>
+		// If user clicks anywhere outside of the modal, Modal will close
+                
+		var modal = document.getElementById('modal-wrapper');
+			window.onclick = function(event) {
+			if (event.target == modal) {
+				modal.style.display = "none";
+			}
+		}
+		</script>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav nav-dropdown nav-right" data-app-modern-menu="true">
+			<li class="nav-item">
+				<a class="nav-link link text-white display-4" id="fav_list"><span class="fa fa-heart-o" style="font-size:36px;"></span>
+					Boardgame
+					</a>
+			</li>
+			<li class="nav-item dropdown open">
+				<a class="nav-link link text-white dropdown-toggle display-4" data-toggle="dropdown-submenu">
+				<i class="fa fa-heart" style="font-size:36px"></i>&nbsp;
+				My Fav</a>
+					<div class="dropdown-menu"><a class="text-white dropdown-item display-4" id="API_show"><i class="fa fa-wrench" style="font-size:36px"></i>&nbsp;My Fav API</a><a class="text-white dropdown-item display-4" id="fav_show"><i class="fa fa-file-text-o" style="font-size:36px"></i>&nbsp;My Fav Table</a></div></li>
+			<li class="nav-item">
+				<a class="nav-link link text-white display-4" id="modify">
+				<i class="fa fa-gear" style="font-size:36px;"></i>&nbsp; 
+					Modify Password
+                    </a>
+			</li>
+			</ul>
+        </div>
+    </nav>
+</section>
+
+<section class="engine"><a href="https://mobirise.info/r">free bootstrap template</a></section><section class="cid-qTkA127IK8 mbr-fullscreen mbr-parallax-background" id="header2-1">
+    <div class="container align-center">
+        <div class="row justify-content-md-center">
+            <div class="mbr-black col-md-10">
+                <h1 class="mbr-section-title mbr-bold pb-3 mbr-fonts-style display-1">
+                    Let's start to play
+                </h1>
+
+                <div class="mbr-section-btn">
+                    <a class="btn btn-md btn-secondary display-4" href="https://en.boardgamearena.com/" target="_blank">Board game online</a>
+                    <!--<a class="btn btn-md btn-black-outline display-4" href="https://mobirise.com">LIVE DEMO</a>-->
+                </div>
+
+            </div>
+			<table width="100%" align="center"><tr><td><iframe width="500" height="380" src="https://www.youtube.com/embed/Lu4zxOOEjbI" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></td><td><iframe width="500" height="380" src="https://www.youtube.com/embed/JRykedv5CJ4" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></td></tr></table>
+        </div>
+    </div>
+    <div class="mbr-arrow"  >
+        <a href="#next">
+            <i class="fa fa-arrow-down" style="font-size:36px"></i>
+        </a>
+    </div>
+</section>
+
+<section class="cid-qTkAaeaxX5" id="footer1-2">
+    <div class="container">
+        <div class="media-container-row content text-white">
+            <div class="col-12 col-md-3">
+                <div class="media-wrap">
+					<img id="index" src="assets/images/logo2.png" alt="Boardgame">
+                </div>
+            </div>
+            <div class="col-12 col-md-3 mbr-fonts-style display-7">
+                <h5 class="pb-3">
+                    Address
+                </h5>
+                <p class="mbr-text">
+                    1234 Street Name
+                    <br>City, AA 99999
+                </p>
+            </div>
+            <div class="col-12 col-md-3 mbr-fonts-style display-7">
+                <h5 class="pb-3">
+                    Contacts
+                </h5>
+                <p class="mbr-text">
+                    Email: support@mobirise.com
+                    <br>Phone: +1 (0) 000 0000 001
+                    <br>Fax: +1 (0) 000 0000 002
+                </p>
+            </div>
+            <div class="col-12 col-md-3 mbr-fonts-style display-7">
+                
+            </div>
+        </div>
+        <div class="footer-lower">
+            <div class="media-container-row">
+                <div class="col-sm-12">
+                    <hr>
+                </div>
+            </div>
+            <div class="media-container-row mbr-white">
+                <div class="col-sm-6 copyright">
+                    <p class="mbr-text mbr-fonts-style display-7">
+                        © Copyright 2019 Mobirise - All Rights Reserved
+                    </p>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</section>
+
+
+  <script src="assets/web/assets/jquery/jquery.min.js"></script>
+  <script src="assets/popper/popper.min.js"></script>
+  <script src="assets/tether/tether.min.js"></script>
+  <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+  <script src="assets/touchswipe/jquery.touch-swipe.min.js"></script>
+  <script src="assets/parallax/jarallax.min.js"></script>
+  <script src="assets/smoothscroll/smooth-scroll.js"></script>
+  <script src="assets/dropdown/js/script.min.js"></script>
+  <script src="assets/theme/js/script.js"></script>
+  
+  
+</body>
+</html>
